@@ -1,0 +1,11 @@
+---
+# defaults file for master
+
+k3s_extra_server_args: []
+k3s_extra_unit_arg: []
+k3s_version: v1.18.8+k3s1
+
+# k3s_master_ip:
+# k3s_registries_conf:
+
+systemd_dir: /etc/systemd/system

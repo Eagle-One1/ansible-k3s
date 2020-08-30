@@ -1,0 +1,70 @@
+---
+
+############################
+#      get checksum        #
+############################
+- name: get sha256 from url
+  set_fact:
+    sha256sum_amd64_file: "{{ lookup('url', 'https://github.com/rancher/k3s/releases/download/{{ k3s_version }}/sha256sum-amd64.txt') }}"
+    sha256sum_arm_file: "{{ lookup('url', 'https://github.com/rancher/k3s/releases/download/{{ k3s_version }}/sha256sum-arm.txt') }}"
+    sha256sum_arm64_file: "{{ lookup('url', 'https://github.com/rancher/k3s/releases/download/{{ k3s_version }}/sha256sum-arm64.txt') }}"
+
+- name: set sha256sum_amd64_dict
+  set_fact:
+    sha256sum_amd64_dict: '{{ sha256sum_amd64_dict|default({})|combine({ item.split()[1]: item.split()[0]})}}'
+  with_items: "{{ sha256sum_amd64_file.split(',') }}"
+
+- name: set sha256sum_arm_dict
+  set_fact:
+    sha256sum_arm_dict: '{{ sha256sum_arm_dict|default({})|combine({ item.split()[1]: item.split()[0]})}}'
+  with_items: "{{ sha256sum_arm_file.split(',') }}"
+
+- name: set sha256sum_arm64_dict
+  set_fact:
+    sha256sum_arm64_dict: '{{ sha256sum_arm64_dict|default({})|combine({ item.split()[1]: item.split()[0]})}}'
+  with_items: "{{ sha256sum_arm64_file.split(',') }}"
+
+- name: set sha256sum
+  set_fact:
+    sha256sum_amd64 : "{{ sha256sum_amd64_dict['k3s'] }}"
+    sha256sum_arm : "{{ sha256sum_arm_dict['k3s-armhf'] }}"
+    sha256sum_arm64 : "{{ sha256sum_arm64_dict['k3s-arm64'] }}"
+
+
+
+############################
+#      download        #
+############################
+- name: Download k3s binary x64
+  get_url:
+    url: https://github.com/rancher/k3s/releases/download/{{ k3s_version }}/k3s
+    dest: /usr/local/bin/k3s
+    owner: root
+    group: root
+    mode: 755
+    checksum: "sha256:{{ sha256sum_amd64 }}"
+  when: ( ansible_facts.architecture == "x86_64" )
+
+- name: Download k3s binary arm64
+  get_url:
+      url: https://github.com/rancher/k3s/releases/download/{{ k3s_version }}/k3s-arm64
+      dest: /usr/local/bin/k3s
+      owner: root
+      group: root
+      mode: 755
+      checksum: "sha256:{{ sha256sum_arm64 }}"
+  when: ( ansible_facts.architecture is search("arm") and ansible_facts.userspace_bits == "64" ) or
+        ( ansible_facts.architecture is search("aarch64") and ansible_facts.userspace_bits == "32" ) or
+        ( ansible_facts.architecture is search("aarch64") and ansible_facts.userspace_bits == "64" )
+
+- name: Download k3s binary armhf
+  get_url:
+      url: https://github.com/rancher/k3s/releases/download/{{ k3s_version }}/k3s-armhf
+      dest: /usr/local/bin/k3s
+      owner: root
+      group: root
+      mode: 755
+      checksum: "sha256:{{ sha256sum_arm }}"
+  when: ( ansible_facts.architecture is search("arm") )
+          and
+        ( ansible_facts.userspace_bits == "32" )

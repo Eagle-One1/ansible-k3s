@@ -1,0 +1,33 @@
+---
+
+# tasks file for node
+
+- name: Include check vars tasks
+  import_tasks: check_vars.yml
+
+- name: Include download tasks
+  import_tasks: download.yml
+
+- name: Copy K3s service file
+  register: k3s_service
+  template:
+    src: "k3s.service.j2"
+    dest: "{{ systemd_dir }}/k3s-node.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart k3s node service with daemon_reload
+
+- name: Enable and check K3s-node service
+  systemd:
+    name: k3s-node
+    enabled: yes
+    state: started
+
+- name: create /etc/rancher/k3s
+  file:
+    path: /etc/rancher/k3s
+    state: directory
+
+- name: Include config registries tasks
+  import_tasks: config_registries.yml

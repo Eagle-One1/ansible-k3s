@@ -1,0 +1,6 @@
+#k3s_master_ip: "{{ hostvars[groups['master'][0]]['ansible_host'] | default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address']) | default(groups['master'][0]) }}"
+
+k3s_master_ip: 10.0.0.12
+
+k3s_extra_server_args:
+  - --flannel-iface eth1

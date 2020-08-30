@@ -1,0 +1,15 @@
+image: ${CI_REGISTRY}/scath/infra/ansible/ansible-ci:${ANSIBLE_VERSION}
+
+stages:
+  - test-ansible
+
+.test_syntax_template:
+  stage: test-ansible
+  script:
+    - ansible-playbook -i master/tests/inventory master/tests/test.yml --syntax-check
+    - ansible-playbook -i node/tests/inventory node/tests/test.yml --syntax-check
+
+ansible_29:
+  extends: .test_syntax_template
+  variables:
+    ANSIBLE_VERSION: "2.9"

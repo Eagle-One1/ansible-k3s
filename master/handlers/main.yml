@@ -1,0 +1,13 @@
+---
+# handlers file for master
+
+- name: restart k3s master service
+  systemd:
+    name: k3s
+    state: restarted
+
+- name: restart k3s master service with daemon_reload
+  systemd:
+    daemon_reload: yes
+    name: k3s
+    state: restarted

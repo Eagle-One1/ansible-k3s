@@ -1,0 +1,13 @@
+---
+# handlers file for node
+
+- name: restart k3s-node service
+  systemd:
+    name: k3s-node
+    state: restarted
+
+- name: restart k3s node service with daemon_reload
+  systemd:
+    daemon_reload: yes
+    name: k3s-node
+    state: restarted

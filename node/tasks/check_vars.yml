@@ -1,0 +1,7 @@
+---
+
+- name: check if k3s_master_ip is define
+  assert:
+    that:
+      - k3s_master_ip is defined
+    fail_msg: "k3s_master_ip is undefined for host : {{ansible_hostname}}"

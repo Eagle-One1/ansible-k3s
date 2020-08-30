@@ -1,0 +1,9 @@
+[master]
+master-vm
+
+[node]
+node-vm1
+node-vm2
+
+[cluster:children]
+master
