@@ -1,0 +1,3 @@
+.vagrant
+vagrant/generated
+!vagrant/generated/.gitkeep
